@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { supabase } from "../lib/supabase";
 
 export default function TravelForm() {
   const [days, setDays] = useState("");
@@ -9,21 +10,39 @@ export default function TravelForm() {
   const [weather, setWeather] = useState("");
   const [activityLevel, setActivityLevel] = useState("");
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    const travelData = {
-      days,
-      budget,
-      travelStyle,
-      weather,
-      activityLevel,
-    };
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
 
-    console.log(travelData);
+    if (!user) {
+        alert("You must be logged in.");
+        return;
+    }
 
-    alert("Travel preferences submitted!");
-  }
+    const { error } = await supabase
+        .from("travel_preferences")
+        .insert([
+        {
+            user_id: user.id,
+            days,
+            budget,
+            travel_style: travelStyle,
+            weather,
+            activity_level: activityLevel,
+        },
+        ]);
+
+    if (error) {
+        console.log(error);
+
+        alert("Failed to save preferences.");
+    } else {
+        alert("Travel preferences saved!");
+    }
+    }
 
   return (
     <form
