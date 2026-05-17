@@ -5,6 +5,7 @@ import { supabase } from "../lib/supabase";
 import { generateRecommendations } from "../lib/recommendations";
 import { generateItinerary } from "../lib/itinerary";
 
+
 export default function TravelForm() {
     const [destination, setDestination] = useState("");
     const [days, setDays] = useState("");
@@ -17,6 +18,7 @@ export default function TravelForm() {
     const [activityLevel, setActivityLevel] = useState("");
     const [recommendations, setRecommendations] = useState<any[]>([]);
     const [itinerary, setItinerary] = useState<any[]>([]);
+    const [travelerPersonality, setTravelerPersonality] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -44,6 +46,7 @@ export default function TravelForm() {
             travel_style: travelStyle,
             weather,
             activity_level: activityLevel,
+            traveler_personality: travelerPersonality,
             }
         ]);
 
@@ -56,7 +59,10 @@ export default function TravelForm() {
         destination,
         travelerType,
         travelStyle,
-        Number(exactBudget)
+        Number(exactBudget),
+        travelerPersonality,
+        weather,
+        activityLevel
         );
 
         setRecommendations(results);
@@ -202,6 +208,50 @@ export default function TravelForm() {
             <option value="foodie">Food Explorer</option>
           </select>
         </div>
+
+        <div>
+            <label className="block mb-3 text-sm opacity-70">
+                Traveler Personality
+            </label>
+
+            <select
+                value={travelerPersonality}
+                onChange={(e) =>
+                setTravelerPersonality(e.target.value)
+                }
+                className="w-full bg-[#0f172a] border border-white/10 rounded-2xl px-5 py-4 outline-none"
+            >
+                <option value="">Select Personality</option>
+
+                <option value="explorer">
+                Explorer
+                </option>
+
+                <option value="relaxed">
+                Relaxed Traveler
+                </option>
+
+                <option value="foodie">
+                Foodie
+                </option>
+
+                <option value="photographer">
+                Photographer
+                </option>
+
+                <option value="nightlife">
+                Nightlife Lover
+                </option>
+
+                <option value="adventure">
+                Adventure Seeker
+                </option>
+
+                <option value="culture">
+                Culture Enthusiast
+                </option>
+            </select>
+            </div>
 
         <div>
           <label className="block mb-3 text-sm opacity-70">
