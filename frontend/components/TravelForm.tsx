@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
+import { generateRecommendations } from "../lib/recommendations";
 
 export default function TravelForm() {
     const [destination, setDestination] = useState("");
@@ -13,6 +14,7 @@ export default function TravelForm() {
     const [travelStyle, setTravelStyle] = useState("");
     const [weather, setWeather] = useState("");
     const [activityLevel, setActivityLevel] = useState("");
+    const [recommendations, setRecommendations] = useState<any[]>([]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -48,7 +50,16 @@ export default function TravelForm() {
 
         alert("Failed to save preferences.");
     } else {
-        alert("Travel preferences saved!");
+        const results = generateRecommendations(
+        destination,
+        travelerType,
+        travelStyle
+        );
+        
+
+        setRecommendations(results);
+
+        alert("AI itinerary generated!");
     }
     }
 
@@ -229,6 +240,37 @@ export default function TravelForm() {
       >
         Generate AI Travel Plan
       </button>
+
+        {recommendations.length > 0 && (
+        <div className="mt-14">
+
+            <h3 className="text-3xl font-black">
+            Recommended Places
+            </h3>
+
+            <div className="grid md:grid-cols-2 gap-6 mt-8">
+
+            {recommendations.map((place, index) => (
+                <div
+                key={index}
+                className="bg-white/5 border border-white/10 rounded-3xl p-6"
+                >
+                <h4 className="text-2xl font-bold">
+                    {place.name}
+                </h4>
+
+                <p className="mt-3 opacity-70">
+                    Type: {place.type}
+                </p>
+
+                <p className="mt-2 opacity-70">
+                    Budget: {place.budget}
+                </p>
+                </div>
+            ))}
+            </div>
+        </div>
+        )}  
     </form>
   );
 }
