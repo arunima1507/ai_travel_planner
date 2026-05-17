@@ -4,11 +4,15 @@ import { useState } from "react";
 import { supabase } from "../lib/supabase";
 
 export default function TravelForm() {
-  const [days, setDays] = useState("");
-  const [budget, setBudget] = useState("");
-  const [travelStyle, setTravelStyle] = useState("");
-  const [weather, setWeather] = useState("");
-  const [activityLevel, setActivityLevel] = useState("");
+    const [destination, setDestination] = useState("");
+    const [days, setDays] = useState("");
+    const [exactBudget, setExactBudget] = useState("");
+    const [travelerType, setTravelerType] = useState("");
+    const [travelersCount, setTravelersCount] = useState("");
+    const [accommodationType, setAccommodationType] = useState("");
+    const [travelStyle, setTravelStyle] = useState("");
+    const [weather, setWeather] = useState("");
+    const [activityLevel, setActivityLevel] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -27,12 +31,16 @@ export default function TravelForm() {
         .insert([
         {
             user_id: user.id,
+            destination,
             days,
-            budget,
+            exact_budget: exactBudget,
+            traveler_type: travelerType,
+            travelers_count: travelersCount,
+            accommodation_type: accommodationType,
             travel_style: travelStyle,
             weather,
             activity_level: activityLevel,
-        },
+            }
         ]);
 
     if (error) {
@@ -74,20 +82,92 @@ export default function TravelForm() {
         </div>
 
         <div>
-          <label className="block mb-3 text-sm opacity-70">
-            Budget
-          </label>
+            <label className="block mb-3 text-sm opacity-70">
+                Exact Budget (₹)
+            </label>
 
-          <select
-            value={budget}
-            onChange={(e) => setBudget(e.target.value)}
-            className="w-full bg-[#0f172a] border border-white/10 rounded-2xl px-5 py-4 outline-none"
-          >
-            <option value="">Select Budget</option>
-            <option value="budget">Budget Friendly</option>
-            <option value="mid-range">Mid Range</option>
-            <option value="luxury">Luxury</option>
-          </select>
+            <input
+                type="number"
+                placeholder="15000"
+                value={exactBudget}
+                onChange={(e) => setExactBudget(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 outline-none"
+            />
+        </div>
+
+        <div>
+            <label className="block mb-3 text-sm opacity-70">
+                Destination
+            </label>
+
+            <select
+                value={destination}
+                onChange={(e) => setDestination(e.target.value)}
+                className="w-full bg-[#0f172a] border border-white/10 rounded-2xl px-5 py-4 outline-none"
+            >
+                <option value="">Select Destination</option>
+
+                <option value="Jaipur">Jaipur</option>
+                <option value="Goa">Goa</option>
+                <option value="Manali">Manali</option>
+                <option value="Mumbai">Mumbai</option>
+                <option value="Delhi">Delhi</option>
+                <option value="Kerala">Kerala</option>
+                <option value="Varanasi">Varanasi</option>
+                <option value="Udaipur">Udaipur</option>
+            </select>
+        </div>
+
+        <div>
+            <label className="block mb-3 text-sm opacity-70">
+                Traveler Type
+            </label>
+
+            <select
+                value={travelerType}
+                onChange={(e) => setTravelerType(e.target.value)}
+                className="w-full bg-[#0f172a] border border-white/10 rounded-2xl px-5 py-4 outline-none"
+            >
+                <option value="">Select Type</option>
+
+                <option value="solo">Solo</option>
+                <option value="couple">Couple</option>
+                <option value="friends">Friends</option>
+                <option value="family">Family</option>
+            </select>
+        </div>
+
+        <div>
+            <label className="block mb-3 text-sm opacity-70">
+                Number of Travelers
+            </label>
+
+            <input
+                type="number"
+                placeholder="2"
+                value={travelersCount}
+                onChange={(e) => setTravelersCount(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 outline-none"
+            />
+        </div>
+
+        <div>
+            <label className="block mb-3 text-sm opacity-70">
+                Accommodation Type
+            </label>
+
+            <select
+                value={accommodationType}
+                onChange={(e) => setAccommodationType(e.target.value)}
+                className="w-full bg-[#0f172a] border border-white/10 rounded-2xl px-5 py-4 outline-none"
+            >
+                <option value="">Select Accommodation</option>
+
+                <option value="hostel">Hostel</option>
+                <option value="hotel">Hotel</option>
+                <option value="resort">Luxury Resort</option>
+                <option value="homestay">Homestay</option>
+            </select>
         </div>
 
         <div>
