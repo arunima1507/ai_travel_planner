@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
 import { generateRecommendations } from "../lib/recommendations";
+import { generateItinerary } from "../lib/itinerary";
 
 export default function TravelForm() {
     const [destination, setDestination] = useState("");
@@ -15,6 +16,7 @@ export default function TravelForm() {
     const [weather, setWeather] = useState("");
     const [activityLevel, setActivityLevel] = useState("");
     const [recommendations, setRecommendations] = useState<any[]>([]);
+    const [itinerary, setItinerary] = useState<any[]>([]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -53,11 +55,13 @@ export default function TravelForm() {
         const results = generateRecommendations(
         destination,
         travelerType,
-        travelStyle
+        travelStyle,
+        Number(exactBudget)
         );
-        
 
         setRecommendations(results);
+        const generatedItinerary = generateItinerary(results, Number(days));
+        setItinerary(generatedItinerary);
 
         alert("AI itinerary generated!");
     }
@@ -268,6 +272,70 @@ export default function TravelForm() {
                 </p>
                 </div>
             ))}
+            </div>
+        </div>
+        )}
+
+        {itinerary.length > 0 && (
+        <div className="mt-16">
+
+            <h3 className="text-3xl font-black">
+            Your AI Itinerary
+            </h3>
+
+            <div className="mt-8 space-y-8">
+
+            {itinerary.map((dayPlan, index) => (
+                <div
+                key={index}
+                className="bg-white/5 border border-white/10 rounded-3xl p-8"
+                >
+                <h4 className="text-2xl font-bold">
+                    Day {dayPlan.day}
+                </h4>
+
+                <div className="mt-6 space-y-4">
+
+                    {dayPlan.morning && (
+                        <div className="bg-black/20 rounded-2xl p-5">
+                        <p className="opacity-60">
+                            Morning
+                        </p>
+
+                        <h5 className="text-xl font-bold mt-2">
+                            {dayPlan.morning.name}
+                        </h5>
+                        </div>
+                    )}
+
+                    {dayPlan.afternoon && (
+                        <div className="bg-black/20 rounded-2xl p-5">
+                        <p className="opacity-60">
+                            Afternoon
+                        </p>
+
+                        <h5 className="text-xl font-bold mt-2">
+                            {dayPlan.afternoon.name}
+                        </h5>
+                        </div>
+                    )}
+
+                    {dayPlan.evening && (
+                        <div className="bg-black/20 rounded-2xl p-5">
+                        <p className="opacity-60">
+                            Evening
+                        </p>
+
+                        <h5 className="text-xl font-bold mt-2">
+                            {dayPlan.evening.name}
+                        </h5>
+                        </div>
+                    )}
+
+                    </div>
+                </div>
+            ))}
+
             </div>
         </div>
         )}  
