@@ -68,6 +68,24 @@ export default function TravelForm() {
 
         setRecommendations(results);
 
+        const response = await fetch("/api/generate-plan", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            destination,
+            days,
+            budget: exactBudget,
+            travelerType,
+            travelStyle,
+        }),
+        });
+
+        const aiData = await response.json();
+
+        console.log(aiData);
+
         const generatedItinerary = generateItinerary(
         results,
         Number(days)
@@ -75,7 +93,7 @@ export default function TravelForm() {
 
         setItinerary(generatedItinerary);
 
-        const response = await fetch(
+        const mlresponse = await fetch(
         "/api/predict",
         {
             method: "POST",
@@ -95,7 +113,7 @@ export default function TravelForm() {
         }
         );
 
-        const data = await response.json();
+        const data = await mlresponse.json();
 
         setMlPrediction(data.prediction);
 
