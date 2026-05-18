@@ -19,6 +19,7 @@ export default function TravelForm() {
     const [recommendations, setRecommendations] = useState<any[]>([]);
     const [itinerary, setItinerary] = useState<any[]>([]);
     const [travelerPersonality, setTravelerPersonality] = useState("");
+    const [mlPrediction, setMlPrediction] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -66,8 +67,37 @@ export default function TravelForm() {
         );
 
         setRecommendations(results);
-        const generatedItinerary = generateItinerary(results, Number(days));
+
+        const generatedItinerary = generateItinerary(
+        results,
+        Number(days)
+        );
+
         setItinerary(generatedItinerary);
+
+        const response = await fetch(
+        "/api/predict",
+        {
+            method: "POST",
+
+            headers: {
+            "Content-Type": "application/json",
+            },
+
+            body: JSON.stringify({
+            traveler_type: travelerType,
+            travel_style: travelStyle,
+            personality: travelerPersonality,
+            weather,
+            activity_level: activityLevel,
+            budget: exactBudget,
+            }),
+        }
+        );
+
+        const data = await response.json();
+
+        setMlPrediction(data.prediction);
 
         alert("AI itinerary generated!");
     }
@@ -388,7 +418,25 @@ export default function TravelForm() {
 
             </div>
         </div>
-        )}  
+        )} 
+
+                {mlPrediction && (
+        <div className="mt-16 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-400/20 rounded-3xl p-8">
+
+            <h3 className="text-3xl font-black">
+            AI Prediction
+            </h3>
+
+            <p className="mt-4 text-xl opacity-80">
+            Based on your personality and travel style,
+            our ML model predicts that you would love:
+            </p>
+
+            <h2 className="mt-6 text-5xl font-black">
+            {mlPrediction}
+            </h2>
+        </div>
+        )} 
     </form>
   );
 }
