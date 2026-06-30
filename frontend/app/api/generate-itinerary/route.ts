@@ -6,6 +6,8 @@ export async function POST(req: Request) {
 
   const body = await req.json();
 
+  console.log("[generate-itinerary] received body:", body);
+
   const prompt = `
   
   Create a detailed personalized travel itinerary.
@@ -13,8 +15,6 @@ export async function POST(req: Request) {
   Destination: ${body.destination}
 
   Number of days: ${body.days}
-
-  Budget: ₹${body.budget}
 
   Traveler Type: ${body.travelerType}
 
@@ -25,6 +25,12 @@ export async function POST(req: Request) {
   Preferred Weather: ${body.weather}
 
   Activity Level: ${body.activityLevel}
+
+  Recommended places already shortlisted by our recommendation engine: ${
+    Array.isArray(body.recommendedPlaces)
+      ? body.recommendedPlaces.join(", ")
+      : "none provided"
+  }
 
   Generate:
   - day-wise itinerary
@@ -39,15 +45,26 @@ export async function POST(req: Request) {
   
   `;
 
-  const result = await model.generateContent(
-    prompt
-  );
+  try {
+    console.log("[generate-itinerary] calling Gemini...");
 
-  const response = await result.response;
+    const result = await model.generateContent(prompt);
 
-  const text = response.text();
+    const response = await result.response;
 
-  return NextResponse.json({
-    itinerary: text,
-  });
+    const text = response.text();
+
+    console.log("[generate-itinerary] Gemini call succeeded, length:", text.length);
+
+    return NextResponse.json({
+      itinerary: text,
+    });
+  } catch (err) {
+    console.error("[generate-itinerary] Gemini call failed:", err);
+
+    return NextResponse.json(
+      { error: "Failed to generate itinerary." },
+      { status: 500 }
+    );
+  }
 }

@@ -20,6 +20,62 @@ export default function TravelForm() {
     const [itinerary, setItinerary] = useState<any[]>([]);
     const [travelerPersonality, setTravelerPersonality] = useState("");
     const [mlPrediction, setMlPrediction] = useState("");
+    const [geminiItinerary, setGeminiItinerary] = useState("");
+    const [geminiLoading, setGeminiLoading] = useState(false);
+    const [geminiError, setGeminiError] = useState("");
+
+  async function fetchGeminiItinerary(places: any[]) {
+    setGeminiLoading(true);
+    setGeminiError("");
+
+    try {
+      console.log("[fetchGeminiItinerary] sending payload:", {
+        destination,
+        days,
+        travelStyle,
+        travelerType,
+        personality: travelerPersonality,
+        weather,
+        activityLevel,
+        recommendedPlaces: places.map((place) => place.name),
+      });
+
+      const response = await fetch("/api/generate-itinerary", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          destination,
+          days,
+          travelStyle,
+          travelerType,
+          personality: travelerPersonality,
+          weather,
+          activityLevel,
+          recommendedPlaces: places.map((place) => place.name),
+        }),
+      });
+
+      console.log("[fetchGeminiItinerary] response status:", response.status);
+
+      if (!response.ok) {
+        throw new Error("Gemini request failed.");
+      }
+
+      const data = await response.json();
+
+      console.log("[fetchGeminiItinerary] received itinerary length:", (data.itinerary || "").length);
+
+      setGeminiItinerary(data.itinerary || "");
+    } catch (err) {
+      console.error("[fetchGeminiItinerary] failed:", err);
+
+      setGeminiError("Could not generate your AI journey. Please try again.");
+    } finally {
+      setGeminiLoading(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -92,6 +148,8 @@ export default function TravelForm() {
         );
 
         setItinerary(generatedItinerary);
+
+        fetchGeminiItinerary(results);
 
         const mlresponse = await fetch(
         "/api/predict",
@@ -454,7 +512,40 @@ export default function TravelForm() {
             {mlPrediction}
             </h2>
         </div>
-        )} 
+        )}
+
+        {(geminiLoading || geminiError || geminiItinerary) && (
+        <div className="mt-16">
+
+            <h3 className="text-3xl font-black">
+            Your Personalized AI Journey
+            </h3>
+
+            <div className="mt-8 bg-gradient-to-br from-amber-500/10 via-white/5 to-purple-500/10 border border-white/10 rounded-3xl p-8 md:p-10">
+
+                {geminiLoading && (
+                <p className="text-lg opacity-70 animate-pulse">
+                    Crafting your personalized journey with AI...
+                </p>
+                )}
+
+                {!geminiLoading && geminiError && (
+                <p className="text-lg text-red-400">
+                    {geminiError}
+                </p>
+                )}
+
+                {!geminiLoading && !geminiError && geminiItinerary && (
+                <div className="prose prose-invert max-w-none">
+                    <p className="whitespace-pre-line leading-relaxed text-lg opacity-90">
+                        {geminiItinerary}
+                    </p>
+                </div>
+                )}
+
+            </div>
+        </div>
+        )}
     </form>
   );
 }
