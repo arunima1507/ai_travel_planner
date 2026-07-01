@@ -64,18 +64,6 @@ export const destinations: Destination[] = [
         personalityMatch: ["culture", "explorer"],
         suitableFor: ["solo", "family", "couple"],
       },
-      {
-        name: "Jal Mahal",
-        type: "relaxed",
-        budget: "low",
-        estimatedCost: 500,
-        bestTime: "afternoon",
-        energyLevel: "moderate",
-        weatherMatch: ["warm"],
-        activityMatch: ["moderate"],
-        personalityMatch: ["relaxed", "photographer"],
-        suitableFor: ["solo", "couple"],
-      },
     ],
   },
   {
